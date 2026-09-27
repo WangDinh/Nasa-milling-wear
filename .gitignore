@@ -1,0 +1,11 @@
+# data (large / regenerable)
+data/raw/*.mat
+data/raw/*.zip
+data/processed/
+models/
+
+# python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/

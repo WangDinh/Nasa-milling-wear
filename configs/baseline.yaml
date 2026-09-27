@@ -1,0 +1,40 @@
+# Baseline experiment: predict flank wear VB (mm) from one run's sensor signals.
+seed: 42
+
+data:
+  raw_path: data/raw/mill.mat
+  processed_dir: data/processed
+  # Train on measured VB only; set true to also use VB linearly interpolated
+  # between measurements (evaluation always uses measured VB only).
+  use_interpolated_vb: false
+
+features:
+  # Steady-state cutting segment (samples @ 250 Hz). Entry ends before ~1300 and
+  # exit starts after ~7000 in every run, see notebooks/01_eda.ipynb.
+  window: [2000, 6500]
+
+# Feature sets compared in the ablation. "sensor" = all hand-crafted signal features.
+feature_sets:
+  process_only: [process]
+  process_time: [process, time]
+  sensor_only: [sensor]
+  sensor_process: [sensor, process]
+
+models: [mean, ridge, svr, rf, gbr]
+
+cnn:
+  use_process: true
+  crop_len: 1024        # random training crops from the steady-state window
+  epochs: 150
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.001
+  width: 32
+  dropout: 0.3
+  eval_stride: 256      # test prediction = mean over sliding windows
+  seeds: [0, 1, 2]      # report mean ± std over independent trainings
+
+output:
+  results_dir: reports/results
+  figures_dir: reports/figures
+  models_dir: models
